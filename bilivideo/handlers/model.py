@@ -20,19 +20,19 @@ _RESET_TOKENS = {"默认", "默認", "default", "reset", "清除", "auto"}
 async def handle_model(services: BiliVideoServices, event: object) -> AsyncIterator[object]:
     if services.config.is_openai_compatible:
         yield event.plain_result(  # type: ignore[attr-defined]
-            "ℹ️ 当前为 openai_compatible 模式,/总结模型 仅在 astrbot 模式可用。\n"
-            "如需切换内置模型,请将 llm_provider 设为 astrbot。"
+            "当前使用独立模型配置，无法通过 /总结模型 切换。\n"
+            "如需使用 AstrBot 内置模型，请在插件配置中将 llm_provider 设为 astrbot。"
         )
         return
 
     context = services.astrbot_context
     if context is None or not hasattr(context, "get_all_providers"):
-        yield event.plain_result("❌ 无法访问 AstrBot 模型列表")  # type: ignore[attr-defined]
+        yield event.plain_result("暂时无法获取 AstrBot 模型列表，请检查机器人配置。")  # type: ignore[attr-defined]
         return
 
     available = _list_providers(context)
     if not available:
-        yield event.plain_result("❌ AstrBot 未配置任何对话模型(Provider)")  # type: ignore[attr-defined]
+        yield event.plain_result("AstrBot 尚未配置对话模型，请先在管理面板添加模型。")  # type: ignore[attr-defined]
         return
 
     arg = parse_command_args(getattr(event, "message_str", "") or "")
@@ -44,17 +44,17 @@ async def handle_model(services: BiliVideoServices, event: object) -> AsyncItera
 
     if arg in _RESET_TOKENS:
         _apply_provider_id(services, "")
-        yield event.plain_result("✅ 已恢复为 AstrBot 当前默认模型")  # type: ignore[attr-defined]
+        yield event.plain_result("已恢复使用 AstrBot 当前默认模型。")  # type: ignore[attr-defined]
         return
 
     if arg not in {pid for pid, _ in available}:
         yield event.plain_result(  # type: ignore[attr-defined]
-            f"❌ 未找到模型 ID「{arg}」\n\n{_format_list(available, current)}"
+            f"未找到模型标识「{arg}」。请从下列可用模型中选择：\n\n{_format_list(available, current)}"
         )
         return
 
     _apply_provider_id(services, arg)
-    yield event.plain_result(f"✅ 已切换内置模型为: {arg}")  # type: ignore[attr-defined]
+    yield event.plain_result(f"已切换到模型「{arg}」。")  # type: ignore[attr-defined]
 
 
 # ──────────────────────────── helpers ──────────────────────────────
@@ -82,15 +82,15 @@ def _list_providers(context: object) -> list[tuple[str, str]]:
 
 
 def _format_list(available: list[tuple[str, str]], current: str) -> str:
-    lines = ["📋 可用内置模型 (provider ID):", "━━━━━━━━━━━━━━━━━━━"]
+    lines = ["可用模型："]
     for pid, model in available:
-        marker = "  ← 当前" if current and pid == current else ""
-        suffix = f" (model: {model})" if model else ""
-        lines.append(f"  • {pid}{suffix}{marker}")
+        marker = "（当前使用）" if current and pid == current else ""
+        suffix = f" · {model}" if model else ""
+        lines.append(f"- {pid}{suffix}{marker}")
     if not current:
-        lines.append("\n当前使用: AstrBot 默认模型")
-    lines.append("\n切换: /总结模型 <provider ID>")
-    lines.append("恢复默认: /总结模型 默认")
+        lines.append("当前使用：AstrBot 默认模型")
+    lines.append("切换：/总结模型 <模型标识>")
+    lines.append("恢复默认：/总结模型 默认")
     return "\n".join(lines)
 
 

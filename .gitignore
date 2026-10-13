@@ -43,3 +43,9 @@ venv/
 .venv/
 .env/
 .envrc
+# Local runtime files
+.env
+.env.*
+*.log
+*.db
+*.sqlite*

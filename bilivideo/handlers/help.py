@@ -13,34 +13,52 @@ HELP_TEMPLATE = """\
 🔐 B站登录状态: {login_status}
 
 📌 登录命令:
-  /B站登录 (bvlogin) → 扫码登录B站
-  /B站登出 (bvlogout) → 退出B站登录
-  /YT登录 (ytlogin) → YouTube 登录(贴 cookies,实验)
-  /YT登出 (ytlogout) → 清除 YouTube cookies
+  /B站登录 → 扫码登录B站
+    别名：bvlogin
+  /B站登出 → 退出B站登录
+    别名：bvlogout
+  /YT登录 → YouTube 登录(贴 cookies,实验)
+    别名：ytlogin
+  /YT登出 → 清除 YouTube cookies
+    别名：ytlogout
 
 📌 基本命令:
-  /总结 (bv) <{platform_scope}视频链接或BV号>
-  /最新视频 (latest) <UP主UID、空间链接或昵称>
+  /总结 <{platform_scope}视频链接或BV号>
+    别名：bv
+  /最新视频 <UP主UID、空间链接或昵称>
+    别名：latest
 
 📌 订阅管理:
-  /订阅 (sub) <UP主UID或昵称>
-  /取消订阅 (unsub) <UP主UID或昵称>
-  /订阅列表 (sublist/subs)
-  /检查更新 (check)
+  /订阅 <UP主UID或昵称>
+    别名：sub
+  /取消订阅 <UP主UID或昵称>
+    别名：unsub
+  /订阅列表
+    别名：sublist/subs
+  /检查更新
+    别名：check
 
 📌 推送目标(增删仅限 bot 管理员):
-  /添加推送群 (addpg) <群号>
-  /添加推送号 (addpu) <QQ号>
-  /推送列表 (pushls)
-  /移除推送 (rmpush) <群号或QQ号>
+  /添加推送群 <群号>
+    别名：addpg
+  /添加推送号 <QQ号>
+    别名：addpu
+  /推送列表
+    别名：pushls
+  /移除推送 <群号或QQ号>
+    别名：rmpush
 
 📌 自动识别:
-  /识别开关 (bvdetect)
+  /识别开关
+    别名：bvdetect
 
 📌 维护:
-  /总结状态 (bvstat)
-  /总结清缓存 (bvclear)
-  /总结模型 (bvmodel)
+  /总结状态
+    别名：bvstat
+  /总结清缓存
+    别名：bvclear
+  /总结模型
+    别名：bvmodel
 
 💡 例: /bv https://www.bilibili.com/video/BV1xx...
 ℹ️ 总结默认以图片形式发送,可在配置中切换。
