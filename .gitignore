@@ -22,6 +22,8 @@ bili_cookies.json
 *.png
 !logo.png
 !assets/*.png
+assets/zongjie*.png
+reapply_autodetect_fix.py
 
 # Audio cache
 *.mp3

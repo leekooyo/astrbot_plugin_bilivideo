@@ -36,11 +36,13 @@ biliVideo v2.0 是一次**完全重写**的工程升级。主要目标:
 ## 🚀 快速开始
 
 ```text
-1. AstrBot 插件市场搜索 biliVideo,或「安装插件 → 填 Git 仓库地址」一键安装 → 重启
+1. 在 AstrBot 中选择「通过仓库地址安装」，填写 https://github.com/leekooyo/astrbot_plugin_bilivideo，然后重启插件
    依赖全部由 AstrBot 自动 pip 安装(含静态 ffmpeg + 内建中文字体),VPS / Docker 无需手动装系统依赖
 2. /B站登录  → 扫码登录
 3. /总结 https://www.bilibili.com/video/BV1xx411c7mD
 ```
+
+本仓库是 [storyAura 原项目](https://github.com/storyAura/astrbot_plugin_biliVideo) 的独立维护版本。此处的更新不会自动合并原作者的新版本；维护差异与原始基线见 [UPSTREAM.md](UPSTREAM.md)。登录 Cookie、订阅记录、生成的音频与图片是运行数据，应保留在本机，不能提交到仓库。`/YT登录` 涉及账户 Cookie，建议只在可信的私聊中操作。
 
 ---
 
@@ -236,8 +238,8 @@ AI 自动组合调用两个工具:`bilibili_search_list` 与 `bilibili_search_do
 ## 🧪 开发与测试
 
 ```bash
-git clone https://github.com/storyAura/astrbot_plugin_biliVideo
-cd astrbot_plugin_biliVideo
+git clone https://github.com/leekooyo/astrbot_plugin_bilivideo
+cd astrbot_plugin_bilivideo
 
 python -m pip install -r requirements.txt
 python -m pip install pytest pytest-asyncio ruff mypy
