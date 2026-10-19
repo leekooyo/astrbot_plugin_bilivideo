@@ -51,3 +51,32 @@ venv/
 *.log
 *.db
 *.sqlite*
+
+# Local verification files
+/tests/
+/.github/workflows/test.yml
+
+# Local data, credentials, and generated files
+/.venv/
+/venv/
+/node_modules/
+/dist/
+/build/
+/.vscode/
+/.idea/
+*.pem
+*.key
+*.p12
+*.pfx
+*.bak
+*.tmp
+*~
+/data/
+/cache/
+/logs/
+/tmp/
+/temp/
+/backups/
+/local/
+/config.json
+/test/

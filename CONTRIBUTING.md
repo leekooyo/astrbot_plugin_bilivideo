@@ -29,7 +29,7 @@ astrbot_plugin_biliVideo/
 │   ├── handlers/          # One file per command/event handler
 │   ├── tools/             # AI function-call tool registrations
 │   └── services.py        # Composition root (BiliVideoServices)
-└── tests/                 # PyTest suite (299 tests as of v2.1.0)
+└── tests/                 # Local-only PyTest suite; excluded from GitHub
 ```
 
 ## Code style
@@ -44,6 +44,8 @@ astrbot_plugin_biliVideo/
   `bilivideo.core.exceptions`.
 
 ## Running checks
+
+The `tests/` directory is maintained locally and excluded from this public repository.
 
 ```bash
 python -m pytest -q

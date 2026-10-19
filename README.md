@@ -9,7 +9,6 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.1.0-orange)](CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-299%20passing-success)](tests/)
 
 </div>
 
@@ -22,7 +21,7 @@ biliVideo v2.0 是一次**完全重写**的工程升级。主要目标:
 - **可维护性**:`main.py` 从 2,000 行单一巨型文件瘦身到约 160 行。所有逻辑下放到 `bilivideo/` 子包,按职责严格分层。
 - **健壮性**:HTTP 层采用共享 `aiohttp.ClientSession` + 指数退避重试;订阅文件原子写入 + `fsync`;Cookie 文件 0600 权限。
 - **响应速度**:带 TTL 的 LRU 缓存避免同一 BV 重复请求 B 站;single-flight 让多人同时粘贴同一链接只触发一次工作。
-- **可测试**:299 个 PyTest 单元/集成测试覆盖 URL 解析、分页、智能截断、结构化输出、订阅持久化、冷却、缓存、消息路由、渲染降级链等。
+- **可测试**:本机保留 PyTest 测试，用于验证 URL 解析、分页、结构化输出、订阅持久化和渲染等逻辑；测试文件不随插件仓库发布。
 - **类型化**:所有 API 返回 `dataclass`(`VideoInfo` / `UploaderInfo` / …),配置读取经 `PluginConfig` 校验。
 
 > 命令、配置项、行为对终端用户**完全向后兼容**。配置文件不需要改动即可升级。
@@ -244,7 +243,7 @@ cd astrbot_plugin_bilivideo
 python -m pip install -r requirements.txt
 python -m pip install pytest pytest-asyncio ruff mypy
 
-python -m pytest -q
+python -m pytest -q  # 需使用本机保留的 tests/
 ruff check .
 mypy bilivideo
 ```
