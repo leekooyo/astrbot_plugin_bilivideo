@@ -79,30 +79,23 @@ async def handle_latest_video(services: BiliVideoServices, event: object) -> Asy
         )
         return
 
+    yield event.plain_result("⏳ 正在查找并总结最新视频，请稍候。")  # type: ignore[attr-defined]
     mid = extract_uid(args)
     if not mid:
-        yield event.plain_result(f"🔍 正在搜索UP主: {args}...")  # type: ignore[attr-defined]
         uploader = await search_uploader_by_name(services.http_client, args)
         if uploader is None:
             yield event.plain_result(  # type: ignore[attr-defined]
-                "❌ 无法识别UP主\n支持: 纯数字UID、空间链接、或UP主昵称"
+                "未找到这位 UP 主。请检查昵称，或改用 UID、空间链接重试。"
             )
             return
         mid = uploader.mid
-        yield event.plain_result(f"✅ 找到UP主【{uploader.name}】(UID:{mid})")  # type: ignore[attr-defined]
-
-    yield event.plain_result(f"⏳ 正在获取UP主 (UID:{mid}) 的最新视频...")  # type: ignore[attr-defined]
 
     videos = await get_latest_videos(services.http_client, mid, count=1)
     if not videos:
-        yield event.plain_result("❌ 未找到该UP主的视频")  # type: ignore[attr-defined]
+        yield event.plain_result("暂未找到这位 UP 主的视频。请检查 UID，稍后再试。")  # type: ignore[attr-defined]
         return
 
     video = videos[0]
-    yield event.plain_result(  # type: ignore[attr-defined]
-        f"📺 找到最新视频: {video.title}\n⏳ 正在生成总结..."
-    )
-
     try:
         note = await services.inflight.run(
             video.bvid,

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import shutil
 from collections.abc import AsyncIterator
 
 from .. import __version__
@@ -25,55 +24,30 @@ async def handle_status(services: BiliVideoServices, event: object) -> AsyncIter
     else:
         scheduler_state = "⚠️ 已启用但未运行"
     targets = await services.subscription_manager.get_push_targets()
-    backends = ", ".join(services.renderer.available_backends) or "无 (将回退纯文本)"
-    diagnostics = getattr(services.renderer, "backend_diagnostics", {})
-    render_diag_lines = "\n".join(
-        f"  - {name}: {reason}" for name, reason in diagnostics.items()
-    )
-    if render_diag_lines:
-        render_diag_lines = f"\n🔎 渲染诊断:\n{render_diag_lines}"
-    wkhtml = "✅" if shutil.which("wkhtmltoimage") or shutil.which("wkhtmltoimage.exe") else "❌"
-    if shutil.which("ffmpeg") or shutil.which("ffmpeg.exe"):
-        ffmpeg = "✅ 系统"
-    else:
-        try:
-            import imageio_ffmpeg
-
-            ffmpeg = "✅ 内建" if imageio_ffmpeg.get_ffmpeg_exe() else "❌"
-        except Exception:
-            ffmpeg = "❌"
     if isinstance(services.llm, DisabledLLMProvider):
         llm_state = "未配置"
     elif cfg.is_openai_compatible:
         llm_state = cfg.llm_model
     else:
         pinned = getattr(services.llm, "provider_id", "") or ""
-        llm_state = f"astrbot:{pinned}" if pinned else "astrbot 当前模型"
+        llm_state = pinned or "当前聊天模型"
 
     if cfg.enable_multi_platform:
-        yt_cookies = "有" if services.youtube_cookies.has() else "无"
-        multi_state = f"on (实验,仅 /总结;YT cookies:{yt_cookies})"
+        multi_state = "已开启（仅 /总结）"
     else:
-        multi_state = "off"
+        multi_state = "已关闭"
 
     body = (
-        "🩺 biliVideo 状态\n"
-        "━━━━━━━━━━━━━━━━━━━\n"
-        f"📌 版本: {__version__}\n"
-        f"🔐 登录: {cookie_state}\n"
-        f"🤖 LLM: {cfg.llm_provider} / {llm_state}\n"
-        f"🎨 渲染后端: {backends}\n"
-        f"🛠 系统工具: ffmpeg {ffmpeg}  wkhtmltoimage {wkhtml}\n"
-        f"🔁 自动识别: {'开' if services.enable_miniapp_detect else '关'}\n"
-        f"🌐 多平台: {multi_state}\n"
-        f"📡 定时检查: {scheduler_state} (间隔 {cfg.check_interval_minutes} 分钟)\n"
-        f"📋 推送目标: {len(targets)} 个\n"
-        f"🗄  视频信息缓存: {video_info_cache_size()} 条\n"
-        f"⏳ 用户冷却窗口: {cfg.user_cooldown_seconds} 秒\n"
-        f"🖼 图片输出: {'on' if cfg.output_image else 'off'}  / "
-        f" 自动分图: {'on' if cfg.enable_auto_split else 'off'}\n"
-        f"💬 合并转发: {'on' if cfg.enable_forward_message else 'off'}\n"
-        f"{render_diag_lines}\n"
+        "视频总结状态\n"
+        f"版本：{__version__}\n"
+        f"B 站账号：{cookie_state}\n"
+        f"总结模型：{llm_state}\n"
+        f"自动识别视频：{'已开启' if services.enable_miniapp_detect else '已关闭'}\n"
+        f"其他视频平台：{multi_state}\n"
+        f"订阅更新检查：{scheduler_state}，每 {cfg.check_interval_minutes} 分钟检查一次\n"
+        f"推送目标：{len(targets)} 个\n"
+        f"缓存的视频信息：{video_info_cache_size()} 条\n"
+        f"图片输出：{'已开启' if cfg.output_image else '已关闭'}\n"
     )
     yield event.plain_result(body)  # type: ignore[attr-defined]
 

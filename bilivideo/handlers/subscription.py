@@ -42,7 +42,6 @@ async def handle_subscribe(services: BiliVideoServices, event: object) -> AsyncI
             return
         mid = uploader.mid
         name = uploader.name
-        yield event.plain_result(f"✅ 找到UP主【{name}】(UID:{mid})")  # type: ignore[attr-defined]
 
     origin = getattr(event, "unified_msg_origin", "")
     count = await services.subscription_manager.get_subscription_count(origin)
@@ -95,7 +94,7 @@ async def handle_unsubscribe(services: BiliVideoServices, event: object) -> Asyn
 
     mid = extract_uid(args)
     if not mid:
-        yield event.plain_result(f"🔍 正在搜索UP主: {args}...")  # type: ignore[attr-defined]
+        yield event.plain_result("正在查找 UP 主，请稍候。")  # type: ignore[attr-defined]
         uploader = await search_uploader_by_name(services.http_client, args)
         if uploader is None:
             yield event.plain_result(  # type: ignore[attr-defined]

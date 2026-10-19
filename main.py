@@ -86,6 +86,11 @@ class BiliVideoPlugin(Star):
 
     @filter.command("总结帮助", alias={"bvhelp", "总结help"})
     async def cmd_help(self, event: AstrMessageEvent) -> AsyncIterator[object]:
+        local_help = self.context.get_registered_star("astrbot_plugin_local_help")
+        helper = getattr(local_help, "star_cls", None)
+        if getattr(local_help, "activated", False) and helper is not None:
+            yield await helper.plugin_detail_image(event, "astrbot_plugin_bilivideo")
+            return
         async for resp in handlers.handle_help(self._services, event):
             yield resp
 
