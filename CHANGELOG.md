@@ -6,6 +6,11 @@ All notable changes to this plugin are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.1 (2026-10-20) — 状态与查询提示
+
+- `/总结状态` 改为展示当前实际输出的版本、登录、模型、自动识别、订阅检查和图片设置。
+- 调整最新视频查询与订阅搜索时的进度和错误提示，减少重复的中间消息。
+
 ## v2.1.0 (2026-08-29) — Markdown/LaTeX 渲染与结构化时间戳
 
 > Feature release from

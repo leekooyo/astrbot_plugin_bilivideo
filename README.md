@@ -3,11 +3,11 @@
 
 # biliVideo · AstrBot B 站视频解析与 AI 总结
 
-**丢一个 B 站链接,AI 帮你秒出精华总结。**
+**发送 B 站链接，获取视频解析与 AI 总结。**
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1.0-orange)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.1-orange)](CHANGELOG.md)
 
 </div>
 
@@ -15,21 +15,19 @@
 
 ---
 
-## ✨ 为什么是 v2.0?
+## 当前版本与架构
 
-biliVideo v2.0 是一次**完全重写**的工程升级。主要目标:
+当前版本为 **v2.1.1**，以 v2.0 的模块化架构为基础。v2.1.0 增加了总结图片的 Markdown/LaTeX 后备渲染和结构化时间戳；本次更新调整了状态输出与查询提示。完整变更见 [更新日志](CHANGELOG.md)。
 
-- **可维护性**:`main.py` 从 2,000 行单一巨型文件瘦身到约 160 行。所有逻辑下放到 `bilivideo/` 子包,按职责严格分层。
-- **健壮性**:HTTP 层采用共享 `aiohttp.ClientSession` + 指数退避重试;订阅文件原子写入 + `fsync`;Cookie 文件 0600 权限。
-- **响应速度**:带 TTL 的 LRU 缓存避免同一 BV 重复请求 B 站;single-flight 让多人同时粘贴同一链接只触发一次工作。
+v2.0 架构的主要设计如下：
+
+- **可维护性**：主要逻辑放在 `bilivideo/` 子包，入口文件负责命令注册。
+- **健壮性**：HTTP 请求复用会话并在失败时重试；订阅数据以原子写入方式保存。
+- **响应速度**：缓存与并发去重减少同一视频的重复请求。
 - **可测试**:本机保留 PyTest 测试，用于验证 URL 解析、分页、结构化输出、订阅持久化和渲染等逻辑；测试文件不随插件仓库发布。
-- **类型化**:所有 API 返回 `dataclass`(`VideoInfo` / `UploaderInfo` / …),配置读取经 `PluginConfig` 校验。
+- **类型化**：视频和用户信息使用数据类表示，配置由 `PluginConfig` 校验。
 
 > 升级前请备份 AstrBot 配置与插件运行数据，并在测试群核对命令和推送行为。
-
-**v2.1.0** 完善总结图片与时间戳([#27](https://github.com/storyAura/astrbot_plugin_biliVideo/pull/27), 感谢 [@Eco404](https://github.com/Eco404)):检测到 `wkhtmltoimage` 时继续用 HTML/CSS 并在服务端预渲染 LaTeX;未安装系统渲染工具时自动用纯 Python 后备(Markdown AST + MathText + Pillow)。开启时间戳且走 AstrBot Provider 时,优先强制工具调用拿到结构化章节并校验范围/顺序,失败或不支持工具时回退原 Markdown 提示词;`openai_compatible` 自建 Provider 行为不变。无需改配置即可升级。详见 [CHANGELOG](CHANGELOG.md)。
-
-**v2.0.1** 是并发与健壮性修复版:手动 `/检查更新` 与定时推送不再可能重复推送同一视频(按订阅加锁);订阅数据写盘失败会回滚并提示、热重载不再可能被旧实例脏写;渲染与写盘全部移出事件循环;推送目标管理命令限制为管理员;版本号与配置默认值单一来源化。另合入引用消息中 QQ 小程序卡片的直接解析([#24](https://github.com/storyAura/astrbot_plugin_biliVideo/pull/24))。
 
 ---
 
@@ -66,17 +64,17 @@ biliVideo v2.0 是一次**完全重写**的工程升级。主要目标:
 
 ### 前置要求
 
-- AstrBot v4.0+
+- 本仓库元数据未声明 AstrBot 最低版本；请先在测试环境验证当前框架版本。
 - Python 3.10+
 - 至少配置一个 LLM Provider(DeepSeek、OpenAI、Claude 等),或在配置中切到 `openai_compatible` 自填 API。
 
-### 开箱即用(VPS / Docker / Zeabur 一键安装)
+### 依赖与渲染后端
 
 通常由 AstrBot 安装 `requirements.txt` 中的 Python 依赖，其中包含:
 
 - **ffmpeg**:由 `imageio-ffmpeg` 提供静态二进制,无字幕视频走 ASR 转写时自动调用;系统若已装 ffmpeg 则优先用系统版。
 - **图片渲染**:检测到 `wkhtmltoimage` 时使用 HTML/CSS 渲染并在服务端预渲染 LaTeX;未检测到时自动使用 Markdown AST + MathText + Pillow 后备。内建 Noto Sans SC 中文字型(GB2312 子集,SIL OFL),容器无图形环境也能出图。
-- 装好后用 `/总结状态` 即可看到检测出的渲染后端与 ffmpeg 来源(系统 / 内建)。
+- 安装后可用 `/总结状态` 查看版本、登录状态、模型、自动识别、订阅检查与图片输出设置。渲染后端与 ffmpeg 来源不在当前状态输出中。
 
 ### 可选增强:wkhtmltopdf HTML/CSS 渲染
 
@@ -117,7 +115,7 @@ apt install -y fonts-noto-cjk    # 或 fonts-wqy-zenhei
 
 | 命令 | 说明 |
 | --- | --- |
-| `/总结状态` | 查看版本 / 登录 / LLM / 渲染后端 / 缓存等 |
+| `/总结状态` | 查看版本、登录、模型、自动识别、订阅检查与图片输出状态 |
 | `/总结清缓存` | 清除视频信息 + WBI + 总结结果缓存 |
 | `/总结模型 [provider ID]` | 列出 / 切换 AstrBot 内置对话模型(仅 astrbot 模式) |
 
@@ -283,8 +281,8 @@ bilivideo/
 
 ## ⚠️ 注意事项
 
-- 首次使用必须先 `/B站登录`。
-- 视频总结约需 1-3 分钟(有字幕时更快)。
+- 需要账号权限的视频，请先在可信私聊中使用 `/B站登录`。
+- 总结耗时取决于视频长度、字幕、网络和模型响应速度。
 - 图片渲染失败会自动回退为纯文本。
 - 引用消息时只识别用户实际发送的内容,引用部分仅在命中触发关键词时被提取。
 - 合并转发需要平台支持(部分平台可能不支持,会自动降级)。
@@ -295,8 +293,7 @@ bilivideo/
 
 - 总结流程(音频下载、字幕获取、Prompt 构建)的核心思路参考自
   [BiliNote](https://github.com/JefferyHcool/BiliNote)。
-- 旧版 v1.x 的实现由 [@storyAura](https://github.com/storyAura) 维护;
-  v2.0 重构在保留所有功能的前提下完成。
+- 旧版 v1.x 的实现由 [@storyAura](https://github.com/storyAura) 维护；v2.0 起的重构与后续贡献见项目提交记录。
 - 引用消息硬拦截的 PR 灵感来自 [@Jeric-X](https://github.com/Jeric-X)。
 - 引用消息中 QQ 小程序卡片解析由 [@pheasantgogogo](https://github.com/pheasantgogogo) 贡献(#24)。
 - Markdown/LaTeX 图片渲染与结构化时间戳由 [@Eco404](https://github.com/Eco404) 贡献(#27)。
