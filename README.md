@@ -5,12 +5,13 @@
 
 **丢一个 B 站链接,AI 帮你秒出精华总结。**
 
-[![AstrBot](https://img.shields.io/badge/AstrBot-v4.0%2B-blueviolet)](https://astrbot.app/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.1.0-orange)](CHANGELOG.md)
 
 </div>
+
+> 本仓库由 [leekooyo](https://github.com/leekooyo) 独立维护，基于 [storyAura 的原项目](https://github.com/storyAura/astrbot_plugin_biliVideo)。安装和更新请使用 [本仓库](https://github.com/leekooyo/astrbot_plugin_bilivideo)；来源与基线见 [UPSTREAM.md](UPSTREAM.md)。
 
 ---
 
@@ -24,7 +25,7 @@ biliVideo v2.0 是一次**完全重写**的工程升级。主要目标:
 - **可测试**:本机保留 PyTest 测试，用于验证 URL 解析、分页、结构化输出、订阅持久化和渲染等逻辑；测试文件不随插件仓库发布。
 - **类型化**:所有 API 返回 `dataclass`(`VideoInfo` / `UploaderInfo` / …),配置读取经 `PluginConfig` 校验。
 
-> 命令、配置项、行为对终端用户**完全向后兼容**。配置文件不需要改动即可升级。
+> 升级前请备份 AstrBot 配置与插件运行数据，并在测试群核对命令和推送行为。
 
 **v2.1.0** 完善总结图片与时间戳([#27](https://github.com/storyAura/astrbot_plugin_biliVideo/pull/27), 感谢 [@Eco404](https://github.com/Eco404)):检测到 `wkhtmltoimage` 时继续用 HTML/CSS 并在服务端预渲染 LaTeX;未安装系统渲染工具时自动用纯 Python 后备(Markdown AST + MathText + Pillow)。开启时间戳且走 AstrBot Provider 时,优先强制工具调用拿到结构化章节并校验范围/顺序,失败或不支持工具时回退原 Markdown 提示词;`openai_compatible` 自建 Provider 行为不变。无需改配置即可升级。详见 [CHANGELOG](CHANGELOG.md)。
 
@@ -36,7 +37,7 @@ biliVideo v2.0 是一次**完全重写**的工程升级。主要目标:
 
 ```text
 1. 在 AstrBot 中选择「通过仓库地址安装」，填写 https://github.com/leekooyo/astrbot_plugin_bilivideo，然后重启插件
-   依赖全部由 AstrBot 自动 pip 安装(含静态 ffmpeg + 内建中文字体),VPS / Docker 无需手动装系统依赖
+   AstrBot 会尝试安装 `requirements.txt` 中的 Python 依赖；不同 VPS / Docker 镜像可能还需要补充系统组件
 2. /B站登录  → 扫码登录
 3. /总结 https://www.bilibili.com/video/BV1xx411c7mD
 ```
@@ -71,7 +72,7 @@ biliVideo v2.0 是一次**完全重写**的工程升级。主要目标:
 
 ### 开箱即用(VPS / Docker / Zeabur 一键安装)
 
-本插件**无需手动安装任何系统依赖**。AstrBot 安装插件时会自动 `pip install -r requirements.txt`,其中已包含:
+通常由 AstrBot 安装 `requirements.txt` 中的 Python 依赖，其中包含:
 
 - **ffmpeg**:由 `imageio-ffmpeg` 提供静态二进制,无字幕视频走 ASR 转写时自动调用;系统若已装 ffmpeg 则优先用系统版。
 - **图片渲染**:检测到 `wkhtmltoimage` 时使用 HTML/CSS 渲染并在服务端预渲染 LaTeX;未检测到时自动使用 Markdown AST + MathText + Pillow 后备。内建 Noto Sans SC 中文字型(GB2312 子集,SIL OFL),容器无图形环境也能出图。
